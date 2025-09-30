@@ -175,7 +175,7 @@ export default function Home() {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Popular Items</h2>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              Customer favorites you'll love
+              Customer favorites you&apos;ll love
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">

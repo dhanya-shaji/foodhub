@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 const AboutPage: React.FC = () => {
@@ -80,18 +81,18 @@ const AboutPage: React.FC = () => {
             </div>
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a
+            <Link 
               href="/contact"
               className="inline-flex items-center justify-center rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
             >
               Get in touch
-            </a>
-            <a
+            </Link>
+            <Link 
               href="/"
               className="inline-flex items-center justify-center rounded-lg border border-zinc-300 bg-transparent px-4 py-2 text-sm font-medium text-zinc-800 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
               Explore the product
-            </a>
+            </Link >
           </div>
         </div>
       </section>
