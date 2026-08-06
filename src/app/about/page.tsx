@@ -5,32 +5,30 @@ const AboutPage: React.FC = () => {
   return (
     <main className="min-h-dvh">
       <section className="container mx-auto max-w-5xl px-4 py-16">
-        <div className="flex flex-col items-start gap-6 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">About Us</h1>
-            <p className="mt-4 text-base/7 text-zinc-600 dark:text-zinc-300">
-              We build modern web experiences focused on performance, accessibility, and delightful user interfaces.
-              Our mission is to turn complex ideas into simple, beautiful products.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <div className="rounded-xl border border-zinc-200 bg-white/60 p-4 text-center shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-              <div className="text-2xl font-semibold">5+</div>
-              <div className="text-xs text-zinc-600 dark:text-zinc-400">Years</div>
+        <div className="max-w-2xl">
+          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">About Us</h1>
+          <p className="mt-4 text-base/7 text-zinc-600 dark:text-zinc-300">
+            We build modern web experiences focused on performance, accessibility, and delightful user interfaces.
+            Our mission is to turn complex ideas into simple, beautiful products.
+          </p>
+        </div>
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          {[
+            { value: "5+", label: "Years" },
+            { value: "20+", label: "Projects" },
+            { value: "10k+", label: "Users" },
+            { value: "99.9%", label: "Uptime" },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="overflow-hidden rounded-xl border border-zinc-200 bg-white/60 px-3 py-4 text-center shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60"
+            >
+              <div className="whitespace-nowrap text-xl font-semibold tabular-nums sm:text-2xl">
+                {stat.value}
+              </div>
+              <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{stat.label}</div>
             </div>
-            <div className="rounded-xl border border-zinc-200 bg-white/60 p-4 text-center shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-              <div className="text-2xl font-semibold">20+</div>
-              <div className="text-xs text-zinc-600 dark:text-zinc-400">Projects</div>
-            </div>
-            <div className="rounded-xl border border-zinc-200 bg-white/60 p-4 text-center shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-              <div className="text-2xl font-semibold">10k+</div>
-              <div className="text-xs text-zinc-600 dark:text-zinc-400">Users</div>
-            </div>
-            <div className="rounded-xl border border-zinc-200 bg-white/60 p-4 text-center shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/60">
-              <div className="text-2xl font-semibold">99.9%</div>
-              <div className="text-xs text-zinc-600 dark:text-zinc-400">Uptime</div>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 

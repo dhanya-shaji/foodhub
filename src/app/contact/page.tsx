@@ -11,20 +11,54 @@ const ContactPage: React.FC = () => {
     subject: "",
     message: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
-    alert("Thank you for your message! We'll get back to you soon.");
-    setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Could not send your message");
+        return;
+      }
+
+      setSuccess(data.message || "Thank you! Your message has been saved.");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
+      });
+    } catch {
+      setError("Unable to reach the server. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -128,11 +162,23 @@ const ContactPage: React.FC = () => {
                 />
               </div>
 
+              {error && (
+                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
+                  {error}
+                </p>
+              )}
+              {success && (
+                <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950/40 dark:text-green-300">
+                  {success}
+                </p>
+              )}
+
               <button
                 type="submit"
-                className="w-full bg-black text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-800 transition duration-200 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                disabled={loading}
+                className="w-full rounded-lg bg-black px-6 py-3 font-semibold text-white transition duration-200 hover:bg-gray-800 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-gray-200"
               >
-                Send Message
+                {loading ? "Saving..." : "Send Message"}
               </button>
             </form>
           </div>
@@ -159,9 +205,9 @@ const ContactPage: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-semibold mb-1">Address</h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    123 Food Street<br />
-                    Downtown District<br />
-                    New York, NY 10001
+                    10999 kreuzberg Berlin<br />
+                    Berlin District<br />
+                    Germany
                   </p>
                 </div>
               </div>
@@ -176,7 +222,7 @@ const ContactPage: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-1">Phone</h3>
                   <p className="text-gray-600 dark:text-gray-300">
                     <Link  href="tel:+15551234567" className="hover:text-black dark:hover:text-white transition">
-                      +1 (555) 123-4567
+                      +49 176 22278364
                     </Link >
                   </p>
                 </div>
