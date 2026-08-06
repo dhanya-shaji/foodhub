@@ -3,10 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import type { Product } from "@/data/products";
+import { countByCategory } from "@/data/products";
+import { useStore } from "@/context/StoreContext";
 
 const carouselImages = [
   {
-    src: "https://images.unsplash.com/photo-1548365328-9f547fb0953c?q=80&w=1200&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=1200&auto=format&fit=crop",
     alt: "Delicious Pizza",
     title: "Fresh Pizza",
     description: "Handcrafted with love and premium ingredients"
@@ -28,55 +31,77 @@ const carouselImages = [
 const menuCategories = [
   {
     name: "Pizza",
-    image: "https://images.unsplash.com/photo-1548365328-9f547fb0953c?q=80&w=400&auto=format&fit=crop",
-    count: 12
+    image:"https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=1200&auto=format&fit=crop",
+    count: countByCategory("Pizza"),
   },
   {
     name: "Burgers",
     image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=400&auto=format&fit=crop",
-    count: 8
+    count: countByCategory("Burgers"),
   },
   {
     name: "Sushi",
     image: "https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=400&auto=format&fit=crop",
-    count: 15
+    count: countByCategory("Sushi"),
   },
   {
     name: "Desserts",
     image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=400&auto=format&fit=crop",
-    count: 6
-  }
+    count: countByCategory("Desserts"),
+  },
 ];
 
-const popularItems = [
-  {
-    name: "Margherita Pizza",
-    price: 12.99,
-    image: "https://images.unsplash.com/photo-1548365328-9f547fb0953c?q=80&w=300&auto=format&fit=crop",
-    rating: 4.8
-  },
-  {
-    name: "Classic Cheeseburger",
-    price: 9.99,
-    image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=300&auto=format&fit=crop",
-    rating: 4.6
-  },
-  {
-    name: "Salmon Sushi Roll",
-    price: 15.99,
-    image: "https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=300&auto=format&fit=crop",
-    rating: 4.9
-  }
-];
+const POPULAR_RATINGS: Record<number, number> = {
+  1: 4.8,
+  4: 4.6,
+  7: 4.9,
+};
+
+type PopularItem = Product & { rating: number };
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [popularItems, setPopularItems] = useState<PopularItem[]>([]);
+  const { addToCart, toggleWishlist, isInWishlist } = useStore();
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
     }, 5000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadPopularItems() {
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        if (!res.ok || cancelled) return;
+
+        const products = (data.products ?? []) as Product[];
+        const featured = [1, 4, 7]
+          .map((productId) => {
+            const product = products.find((item) => item.id === productId);
+            if (!product) return null;
+            return {
+              ...product,
+              rating: POPULAR_RATINGS[productId] ?? 4.5,
+            };
+          })
+          .filter((item): item is PopularItem => item !== null);
+
+        setPopularItems(featured);
+      } catch {
+        // Keep empty popular list on network errors
+      }
+    }
+
+    loadPopularItems();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -146,7 +171,7 @@ export default function Home() {
             {menuCategories.map((category, index) => (
               <Link
                 key={index}
-                href="/product"
+                href={`/product?category=${encodeURIComponent(category.name)}`}
                 className="group relative overflow-hidden rounded-xl bg-white shadow-sm transition hover:shadow-lg dark:bg-zinc-800"
               >
                 <div className="aspect-square">
@@ -179,29 +204,51 @@ export default function Home() {
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {popularItems.map((item, index) => (
+            {popularItems.map((item) => (
               <div
-                key={index}
-                className="group rounded-xl overflow-hidden bg-white shadow-sm transition hover:shadow-lg dark:bg-zinc-800"
+                key={item.id}
+                className="group overflow-hidden rounded-xl bg-white shadow-sm transition hover:shadow-lg dark:bg-zinc-800"
               >
-                <div className="aspect-video relative">
+                <div className="relative aspect-video">
                   <Image
-                    src={item.image}
+                    src={item.imageUrl}
                     alt={item.name}
                     fill
                     className="object-cover transition group-hover:scale-105"
                   />
+                  <button
+                    type="button"
+                    onClick={() => toggleWishlist(item)}
+                    aria-label={
+                      isInWishlist(item.id)
+                        ? "Remove from wishlist"
+                        : "Add to wishlist"
+                    }
+                    className={`absolute right-3 top-3 rounded-full px-2.5 py-1.5 text-sm shadow-sm transition ${
+                      isInWishlist(item.id)
+                        ? "bg-black text-white dark:bg-white dark:text-black"
+                        : "bg-white/90 text-zinc-800 hover:bg-white"
+                    }`}
+                  >
+                    {isInWishlist(item.id) ? "♥" : "♡"}
+                  </button>
                 </div>
                 <div className="p-6">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="mb-2 flex items-center justify-between">
                     <h3 className="text-xl font-semibold">{item.name}</h3>
                     <div className="flex items-center">
                       <span className="text-yellow-500">★</span>
                       <span className="ml-1 text-sm">{item.rating}</span>
                     </div>
                   </div>
-                  <p className="text-2xl font-bold text-green-600">${item.price}</p>
-                  <button className="mt-4 w-full rounded-lg bg-black py-2 text-white transition hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
+                  <p className="text-2xl font-bold text-green-600">
+                    ${item.price.toFixed(2)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => addToCart(item)}
+                    className="mt-4 w-full rounded-lg bg-black py-2 text-white transition hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                  >
                     Add to Cart
                   </button>
                 </div>
