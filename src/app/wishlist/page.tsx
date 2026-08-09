@@ -49,7 +49,7 @@ export default function WishlistPage() {
                     <p className="text-xs text-zinc-500">{product.category}</p>
                   </div>
                   <span className="text-sm font-semibold">
-                    ${product.price.toFixed(2)}
+                    €{product.price.toFixed(2)}
                   </span>
                 </div>
                 <div className="mt-4 flex gap-2">

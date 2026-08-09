@@ -204,7 +204,7 @@ export default function ProfilePage() {
                       {order.status}
                     </span>
                     <span className="text-sm font-semibold">
-                      ${order.total.toFixed(2)}
+                      €{order.total.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -227,12 +227,12 @@ export default function ProfilePage() {
                       <div className="flex-1">
                         <p className="text-sm font-medium">{item.name}</p>
                         <p className="text-xs text-zinc-500">
-                          {item.category} · Qty {item.quantity} · $
+                          {item.category} · Qty {item.quantity} · €
                           {item.price.toFixed(2)} each
                         </p>
                       </div>
                       <p className="text-sm font-medium">
-                        ${(item.subtotal ?? item.price * item.quantity).toFixed(2)}
+                        €{(item.subtotal ?? item.price * item.quantity).toFixed(2)}
                       </p>
                     </li>
                   ))}
@@ -265,13 +265,13 @@ export default function ProfilePage() {
                         {order.paymentMethod}
                       </p>
                       <p className="text-zinc-600 dark:text-zinc-400">
-                        Subtotal ${order.subtotal.toFixed(2)}
+                        Subtotal €{order.subtotal.toFixed(2)}
                       </p>
                       <p className="text-zinc-600 dark:text-zinc-400">
-                        Delivery ${order.deliveryFee.toFixed(2)}
+                        Delivery €{order.deliveryFee.toFixed(2)}
                       </p>
                       <p className="font-medium">
-                        Total ${order.total.toFixed(2)}
+                        Total €{order.total.toFixed(2)}
                       </p>
                     </div>
                   </div>

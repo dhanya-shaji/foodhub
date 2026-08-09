@@ -44,7 +44,7 @@ export default function ProductCard({ product, priority }: ProductCardProps) {
             <div className="text-xs text-zinc-500">{product.category}</div>
           </div>
           <div className="shrink-0 rounded-md bg-zinc-100 px-2 py-1 text-sm font-semibold dark:bg-zinc-800">
-            ${product.price.toFixed(2)}
+            €{product.price.toFixed(2)}
           </div>
         </div>
         <button

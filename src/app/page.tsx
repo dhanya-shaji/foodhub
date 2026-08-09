@@ -242,7 +242,7 @@ export default function Home() {
                     </div>
                   </div>
                   <p className="text-2xl font-bold text-green-600">
-                    ${item.price.toFixed(2)}
+                    €{item.price.toFixed(2)}
                   </p>
                   <button
                     type="button"
