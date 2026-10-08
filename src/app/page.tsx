@@ -57,11 +57,14 @@ const POPULAR_RATINGS: Record<number, number> = {
   7: 4.9,
 };
 
+const POPULAR_RATINGS_IDS = Object.keys(POPULAR_RATINGS);
+
 type PopularItem = Product & { rating: number };
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [popularItems, setPopularItems] = useState<PopularItem[]>([]);
+  const [popularLoading, setPopularLoading] = useState(true);
   const { addToCart, toggleWishlist, isInWishlist } = useStore();
 
   useEffect(() => {
@@ -95,6 +98,8 @@ export default function Home() {
         setPopularItems(featured);
       } catch {
         // Keep empty popular list on network errors
+      } finally {
+        if (!cancelled) setPopularLoading(false);
       }
     }
 
@@ -120,6 +125,7 @@ export default function Home() {
                 src={image.src}
                 alt={image.alt}
                 fill
+                sizes="100vw"
                 className="object-cover"
                 priority={index === 0}
               />
@@ -179,6 +185,7 @@ export default function Home() {
                     src={category.image}
                     alt={category.name}
                     fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover transition group-hover:scale-105"
                   />
                 </div>
@@ -204,6 +211,19 @@ export default function Home() {
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
+            {popularLoading &&
+              POPULAR_RATINGS_IDS.map((id) => (
+                // Placeholder with the real card's dimensions so the page does not
+                // shift (CLS) when the products arrive.
+                <div
+                  key={id}
+                  aria-hidden="true"
+                  className="overflow-hidden rounded-xl bg-white shadow-sm dark:bg-zinc-800"
+                >
+                  <div className="aspect-video animate-pulse bg-zinc-200 dark:bg-zinc-700" />
+                  <div className="h-[172px]" />
+                </div>
+              ))}
             {popularItems.map((item) => (
               <div
                 key={item.id}
@@ -214,6 +234,7 @@ export default function Home() {
                     src={item.imageUrl}
                     alt={item.name}
                     fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition group-hover:scale-105"
                   />
                   <button

@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Providers from "@/components/Providers";
 import PwaRegister from "@/components/PwaRegister";
+import WebVitals from "@/components/WebVitals";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <PwaRegister />
+          <WebVitals />
         </Providers>
       </body>
     </html>

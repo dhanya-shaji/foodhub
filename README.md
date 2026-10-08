@@ -7,6 +7,7 @@ A food ordering app built with Next.js 15 (App Router), React 19, Tailwind CSS 4
 - [Getting started](#getting-started)
 - [Project structure](#project-structure)
 - [Progressive Web App](#progressive-web-app)
+- [Web Vitals](#web-vitals)
 - [Testing](#testing)
 - [Interview notes](#interview-notes)
 - [Known limitations](#known-limitations)
@@ -129,9 +130,39 @@ To install on a phone, deploy over HTTPS (for example Vercel).
 
 ---
 
+## Web Vitals
+
+Core Web Vitals measure real-user experience: **LCP** (loading, good <= 2.5 s), **INP** (responsiveness, good <= 200 ms) and **CLS** (visual stability, good <= 0.1). FCP and TTFB are reported too.
+
+### How it is wired
+- `src/components/WebVitals.tsx` uses Next.js `useReportWebVitals` and sends each metric to `/api/vitals` with `sendBeacon` (falling back to `fetch` with `keepalive`).
+- `src/app/api/vitals/route.ts` validates the metric (known name, numeric value, valid rating) and logs one JSON line per metric on the server. Replace the `console.info` with a database write or analytics call to keep history.
+- Both are covered by unit tests.
+
+### See it
+```bash
+npm run build && npm start
+```
+Open the app, click around, then switch tab. LCP, FCP and TTFB appear soon after load; CLS and INP are reported when you leave the page. The JSON lines show in the terminal running `npm start`.
+
+### Lighthouse (lab score)
+Run on the production build in mobile mode: Chrome DevTools, Lighthouse tab, Performance. Or:
+```bash
+npx lighthouse http://localhost:3000 --only-categories=performance --view
+```
+
+### Changes made for performance
+- Added `sizes` to the home page images so the browser downloads right-sized images (Lighthouse estimated about 19 KiB of savings on the home page).
+- The hero image already used `priority`. It is the LCP element.
+- The Popular Items section shows placeholder cards of the same height while products load, so the layout does not shift when they arrive.
+
+Measured on the home page with Lighthouse (mobile, production build): score 95 before and after, LCP 2.8 s to 2.7 s, CLS 0, TBT 30 ms to 20 ms. The gain is small because the page was already in good shape.
+
+---
+
 ## Testing
 
-There are **122 unit/component tests** (Vitest) and **19 end-to-end tests** (Playwright). Neither set needs a running MongoDB: the database is mocked in unit tests and the API is mocked in the end-to-end flows.
+There are **134 unit/component tests** (Vitest) and **19 end-to-end tests** (Playwright). Neither set needs a running MongoDB: the database is mocked in unit tests and the API is mocked in the end-to-end flows.
 
 ### The testing pyramid
 | Layer | Tool | What it proves | Speed |
@@ -209,7 +240,7 @@ Failed runs write details to `test-results/` (`error-context.md`, and traces if 
 "FoodHub is a Next.js 15 app with MongoDB. I turned it into a Progressive Web App so users can install it and use it like a native app, with graceful offline behavior. A PWA needs a manifest, a service worker and HTTPS. I added all three, plus an offline fallback page and a custom install button. The service worker never caches authenticated or order data."
 
 ### 30-second pitch: testing
-"I set up three layers of tests: Vitest for unit, API and model tests, React Testing Library for components, and Playwright for end-to-end flows in a real browser. That's 122 unit/component tests and 19 E2E tests. The database is mocked so tests are fast and deterministic. I also tested the service worker itself, including the rule that auth and order data are never cached."
+"I set up three layers of tests: Vitest for unit, API and model tests, React Testing Library for components, and Playwright for end-to-end flows in a real browser. That's 134 unit/component tests and 19 E2E tests. The database is mocked so tests are fast and deterministic. I also tested the service worker itself, including the rule that auth and order data are never cached."
 
 ### PWA questions
 **How is a PWA different from a native app?**
